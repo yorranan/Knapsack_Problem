@@ -1,11 +1,19 @@
 import random
 
-def gerarPopulacao(tamanho):
+def gerarPopulacao(tamanho, index_max, populacao_existente):
     populacao = []
     FITNESS_ZERADO = 0
-    index = 0
-    for i in range(tamanho):
+    if index_max != None:
+        index = index_max
+    else:
+        index = 0
+    if populacao != None:
+        for i in range(tamanho):
         populacao.append((index, preencherCromossomo(), FITNESS_ZERADO))
+        index += 1
+    else:
+        for i in populacao_existente:
+        populacao_existente.append((index, preencherCromossomo(), FITNESS_ZERADO))
         index += 1
 
     return populacao
@@ -40,18 +48,55 @@ def calcularPeso(cromossomo):
     for i,j in zip(cromossomo, lista_de_pesos):
         peso += i*j;
     return peso
-    
 
+def selecionaElite(populacao, tamanho):
+    elite = []
+    i = 0
+    while i < tamanho:
+        elite.append(populacao.pop())
+        i += 1
+    return elite
+
+def gerarFilhos(populacao):
+    filhos = []
+    POSICAO_FITNESS = 2
+
+    while len(populacao) >= 2:
+        pai = populacao.pop(random.choice(range(len(populacao))))
+        mae = populacao.pop(random.choice(range(len(populacao))))
+
+        if pai[POSICAO_FITNESS] < mae[POSICAO_FITNESS]:
+            filho = pai[1][:6] + mae[1][6:]
+        else:
+            filho = mae[1][:6] + pai[1][6:]
+
+        filhos.append(filho)
+
+    return filhos
+
+    
 geracao = 0
-TAM_POPULACAO = 10
-PESO_MAXIMO = 15000
+TAM_POPULACAO = 20
+TAM_ELITE = 25%TAM_POPULACAO
+TAM_CROSSOVER = 50%TAM_POPULACAO
+TAM_MUTACAO = 25%TAM_POPULACAO
+PESO_MAXIMO = 12000
+nova_geracao = []
 populacao = gerarPopulacao(TAM_POPULACAO)
-nova_populacao = avaliarPopulacao(populacao, PESO_MAXIMO)
-for individuo in populacao:
-    print(individuo)
-print("Pos avaliar:")
-for individuo in nova_populacao:
-    print(individuo) 
+populacao = avaliarPopulacao(populacao, PESO_MAXIMO)
+populacao = sorted(populacao, key=lambda x: x[2])
+elite = selecionaElite(populacao, TAM_ELITE)
+elite_avaliada = avaliarPopulacao(elite, PESO_MAXIMO)
+populacao = sorted(populacao, key=lambda x: x[2], reverse=True)
+para_mutacao = selecionaElite(populacao, TAM_MUTACAO)
+nova_geracao = gerarFilhos(populacao)
+nova_geracao.extend(elite_avaliada)
+print("elite:")
+for i in elite:
+    print(i)
+print("final")
+for i in nova_geracao:
+    print(i)
 """ while geracao < 20:
     resultados = avaliarPopulacao(populacao, PESO_MAXIMO)
     geracao += 1
