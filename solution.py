@@ -1,5 +1,6 @@
 import random
 from math import inf
+import time
 
 def gerarPopulacaoInicial(tamanho):
     populacao = []
@@ -125,16 +126,17 @@ def mutar(populacao):
    return avaliarPopulacao(populacao)
 
 
-TAXA_DE_MUTACAO = 0.05
-TAM_POPULACAO = 100
-TAX_CROSSOVER = 65%TAM_POPULACAO
-TAM_ELITE = 5%TAM_POPULACAO
-TAM_MUTACAO = 10%TAM_POPULACAO
-PESO_MAXIMO = 10000
+tempo_o = time.time()
+TAXA_DE_MUTACAO = 0.25
+TAM_POPULACAO = 200
+TAX_CROSSOVER = 75%TAM_POPULACAO
+TAM_ELITE = 10%TAM_POPULACAO
+TAM_MUTACAO = 5%TAM_POPULACAO
+PESO_MAXIMO = 8000
 POSICAO_INDEX = 0
 POSICAO_CROMOSSOMO = 1
 POSICAO_FITNESS = 2
-NUM_GERACOES = 100
+NUM_GERACOES = 500
 geracao = 0
 max_index = 0
 nova_geracao = []
@@ -161,5 +163,4 @@ print("Melhor resultado global:")
 print(melhor_resultado)
 print("Resultado iteração final:")
 print(nova_geracao[0])
-
-    
+print("Tempo de execução: {:.1f}".format(time.time()-tempo_o))
