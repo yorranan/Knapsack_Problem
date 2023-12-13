@@ -1,4 +1,5 @@
 import random
+from math import inf
 
 def gerarPopulacaoInicial(tamanho):
     populacao = []
@@ -50,7 +51,7 @@ def calcularPeso(cromossomo):
         peso += i*j;
     return peso
 
-def selecionarMenores(populacao, tamanho):
+def selecionarMenoresFitness(populacao, tamanho):
     menores_resultados = []
     i = 0
     while i < tamanho:
@@ -61,7 +62,7 @@ def selecionarMenores(populacao, tamanho):
         i += 1
     return menores_resultados
 
-def selecionarMaiores(populacao, tamanho):
+def selecionarMaioresFitness(populacao, tamanho):
     maiores_resultados = []
     populacao.reverse()
     i = 0
@@ -75,13 +76,15 @@ def selecionarMaiores(populacao, tamanho):
 
 def gerarFilhos(populacao):
     filhos = []
-    while len(populacao) >= 2:
+    tamanho = TAX_CROSSOVER
+    while tamanho > 0 and len(populacao) >= 2:
         pai = populacao.pop(random.choice(range(len(populacao))))
         mae = populacao.pop(random.choice(range(len(populacao))))
         filho = pai[1][:6] + mae[1][6:]
-        filha = mae[1][:6] + pai[1][6:]
+        filha = mae[1][:6] + pai    [1][6:]
         filhos.append(filha)
         filhos.append(filho)
+        tamanho -= 1
 
     return filhos
 
@@ -97,32 +100,66 @@ def completarPopulacao(populacao):
     return populacao
 
 def melhorResultado(populacao):
-    melhor = populacao[0]
-    return melhor
+    global melhor_resultado
+    global melhor_fitness
+    try:
+        if populacao[0][2] < melhor_fitness:
+            melhor_fitness = populacao[0][2]
+            melhor_resultado = populacao[0]
+    except IndexError:
+        print("Fora do range")
     
-TAM_POPULACAO = 20
-TAM_ELITE = 25%TAM_POPULACAO
-TAM_CROSSOVER = 50%TAM_POPULACAO
-TAM_MUTACAO = 25%TAM_POPULACAO
-PESO_MAXIMO = 12000
+def mutar(populacao):
+   for individuo in populacao:
+       cromossomo = individuo[1]
+       for i in range(len(cromossomo)):
+           for j in range(4):
+               if random.random() < TAXA_DE_MUTACAO:
+                if i < 4:
+                    cromossomo[i] = random.randrange(0, 2)
+                elif i < 8:
+                    cromossomo[i] = random.randrange(0, 4)
+                else:
+                    cromossomo[i] = random.randrange(0, 64)
+            
+   return avaliarPopulacao(populacao)
+
+
+TAXA_DE_MUTACAO = 0.05
+TAM_POPULACAO = 100
+TAX_CROSSOVER = 65%TAM_POPULACAO
+TAM_ELITE = 5%TAM_POPULACAO
+TAM_MUTACAO = 10%TAM_POPULACAO
+PESO_MAXIMO = 10000
 POSICAO_INDEX = 0
 POSICAO_CROMOSSOMO = 1
 POSICAO_FITNESS = 2
+NUM_GERACOES = 100
 geracao = 0
 max_index = 0
 nova_geracao = []
 populacao = []
 melhor_resultado = None
-
+melhor_resultado_final = None
+melhor_fitness = inf
 populacao = gerarPopulacaoInicial(TAM_POPULACAO)
-populacao = sorted(populacao, key=lambda x: x[POSICAO_FITNESS], reverse=True)
-imprimirPopulacao("População Inicial:", populacao)
-melhores_resultados = selecionarMenores(populacao, TAM_ELITE)
-piores_resultados = selecionarMaiores(populacao, TAM_MUTACAO)
-nova_geracao = inicializarGeracao(gerarFilhos(populacao))
-nova_geracao.extend(melhores_resultados)
-nova_geracao = completarPopulacao(populacao)
-imprimirPopulacao("Populacao Final:",nova_geracao)
-print("Melhor resultado ")
-print(melhorResultado(melhores_resultados))
+while geracao < NUM_GERACOES:
+    populacao = sorted(populacao, key=lambda x: x[POSICAO_FITNESS], reverse=True)
+    melhores_resultados = selecionarMenoresFitness(populacao, TAM_ELITE)
+    piores_resultados = selecionarMaioresFitness(populacao, TAM_MUTACAO)
+    nova_geracao.clear()
+    nova_geracao = inicializarGeracao(gerarFilhos(populacao))
+    nova_geracao.extend(melhores_resultados)
+    piores_resultados = mutar(piores_resultados)
+    nova_geracao.extend(piores_resultados)
+    nova_geracao = completarPopulacao(nova_geracao)
+    nova_geracao = sorted(nova_geracao, key=lambda x: x[POSICAO_FITNESS], reverse=True)
+    melhorResultado(nova_geracao)
+    populacao = nova_geracao
+    geracao += 1
+print("Melhor resultado global:")
+print(melhor_resultado)
+print("Resultado iteração final:")
+print(nova_geracao[0])
+
     
