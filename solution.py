@@ -21,7 +21,7 @@ def inicializarGeracao(populacao_existente):
 
 def preencherCromossomo():
    cromossomo = []
-   TAMANHO_CROMOSSOMO = 11
+   TAMANHO_CROMOSSOMO = 12
    i = 0
    while i < TAMANHO_CROMOSSOMO:
         
@@ -127,16 +127,16 @@ def mutar(populacao):
 
 
 tempo_o = time.time()
-TAXA_DE_MUTACAO = 0.25
-TAM_POPULACAO = 200
-TAX_CROSSOVER = 75%TAM_POPULACAO
+TAXA_DE_MUTACAO = float(input("Taxa de Mutacao: "))/100
+TAM_POPULACAO = int(input("Tamanho da Populacao: "))
+TAX_CROSSOVER = int(input("Taxa de Crossover: "))%TAM_POPULACAO
 TAM_ELITE = 10%TAM_POPULACAO
 TAM_MUTACAO = 5%TAM_POPULACAO
 PESO_MAXIMO = 8000
 POSICAO_INDEX = 0
 POSICAO_CROMOSSOMO = 1
 POSICAO_FITNESS = 2
-NUM_GERACOES = 500
+NUM_GERACOES = int(input("Numero de Geracoes: "))
 geracao = 0
 max_index = 0
 nova_geracao = []
