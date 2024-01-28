@@ -97,17 +97,16 @@ def mutar(populacao):
 
 
 tempo_o = time.time()
-TAMANHO_CROMOSSOMO = 10
-FITNESS_ZERADO = 0
-TAM_POPULACAO = 100
-TAX_CROSSOVER = 20%TAM_POPULACAO
+TAXA_DE_MUTACAO = float(input("Taxa de Mutacao: "))/100
+TAM_POPULACAO = int(input("Tamanho da Populacao: "))
+TAX_CROSSOVER = int(input("Taxa de Crossover: "))%TAM_POPULACAO
 TAM_ELITE = 10%TAM_POPULACAO
 TAM_MUTACAO = 5%TAM_POPULACAO
 PESO_MAXIMO = 12
 POSICAO_INDEX = 0
 POSICAO_CROMOSSOMO = 1
 POSICAO_FITNESS = 2
-NUM_GERACOES = 100
+NUM_GERACOES = int(input("Numero de Geracoes: "))
 geracao = 0
 max_index = 0
 nova_geracao = []
