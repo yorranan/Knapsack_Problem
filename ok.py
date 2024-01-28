@@ -3,10 +3,10 @@ import random
 TAMANHO_CROMOSSOMO = 7
 PESO_MAXIMO = 13
 TAMANHO_POPULACAO = int(input("Tamanho da Populacao : "))
-TAX_CROSSOVER = int(input("Taxa de Crossover : "))%TAMANHO_POPULACAO
-TAX_MUTACAO = int(input("Taxa de Mutacao : "))%TAMANHO_POPULACAO
+TAX_CROSSOVER = int(input("Taxa de Crossover : "))//TAMANHO_POPULACAO
+TAX_MUTACAO = int(input("Taxa de Mutacao : "))//TAMANHO_POPULACAO
 NUM_GERACOES = int(input("Numero de Geracoes : "))
-TAMANHO_ELITE = 20%TAMANHO_POPULACAO
+TAMANHO_ELITE = 20//TAMANHO_POPULACAO
 
 def preencherPopulacao(tamanho):
     global geracao
@@ -61,13 +61,14 @@ def selecionarElite(populacao):
 
 def gerarFilhos(populacao:list):
     filhos = []
+    global geracao
     tax = TAX_CROSSOVER
     tam_lista = len(populacao)
     while tam_lista >= 2:
         pai = populacao.pop(random.choice(range(len(populacao))))
         mae = populacao.pop(random.choice(range(len(populacao))))
         filho = pai[1][:3] + mae[1][3:]
-        filhos.append((0, filho, 0))
+        filhos.append((geracao, filho, 0))
         tam_lista = len(populacao)
         tax -= 1
         if tax <= 0:
@@ -88,7 +89,15 @@ def mutar(populacao:tuple):
         i += 1
     return populacao
 
+def verificarMelhorResultado(populacao):
+    populacao.sort(key=lambda x: x[2], reverse=True)
+    resultado = populacao[0]
+    global melhor_resultado_global
+    if not melhor_resultado_global or resultado[2] > melhor_resultado_global[2]:
+        melhor_resultado_global = resultado
+
 geracao = 0
+melhor_resultado_global = None
 populacao = preencherPopulacao(TAMANHO_POPULACAO)
 elite = selecionarElite(populacao)
 filhos = gerarFilhos(populacao)
@@ -100,15 +109,18 @@ elite.clear()
 filhos.clear()
 
 while geracao < NUM_GERACOES:  
+    geracao += 1
     elite = selecionarElite(populacao)
     filhos = gerarFilhos(populacao)
     filhos = mutar(filhos)
     populacao.clear()
     populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
     populacao = avaliarPopulacao(populacao)
-    geracao += 1
+    verificarMelhorResultado(populacao)
 
-print("Final population after", NUM_GERACOES ,"generations:")
+print("Melhor resultado global:")
+print(melhor_resultado_global)
+print("População Final após", NUM_GERACOES ,"gerações:")
 populacao.sort(key=lambda x: x[2], reverse=True)
 for individuo in populacao:
     print(individuo)
