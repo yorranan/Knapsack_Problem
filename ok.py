@@ -2,10 +2,10 @@ import random
 
 TAMANHO_CROMOSSOMO = 7
 PESO_MAXIMO = 13
-TAX_CROSSOVER = 5
-TAMANHO_POPULACAO = 10
-TAX_MUTACAO = 2
-TAM_ELITE = 2
+TAMANHO_POPULACAO = 50
+TAX_CROSSOVER = 50%TAMANHO_POPULACAO
+TAX_MUTACAO = 20%TAMANHO_POPULACAO
+TAM_ELITE = 20%TAMANHO_POPULACAO
 
 def mudarNumeroDaGeracao(populacao):
     global geracao
@@ -14,10 +14,11 @@ def mudarNumeroDaGeracao(populacao):
         nova.append((individuo[0]+1, individuo[1], individuo[2]))
     return nova
 
-def gerarPopulacaoInicial(tamanho):
+def preencherPopulacao(tamanho):
+    global geracao
     populacao = []
     for i in range(tamanho):
-        populacao.append((0, preencherCromossomo(), 0))
+        populacao.append((geracao, preencherCromossomo(), 0))
     populacao = avaliarPopulacao(populacao)
     return populacao
 
@@ -72,9 +73,7 @@ def gerarFilhos(populacao:list):
         pai = populacao.pop(random.choice(range(len(populacao))))
         mae = populacao.pop(random.choice(range(len(populacao))))
         filho = pai[1][:6] + mae[1][6:]
-        filha = mae[1][:6] + pai[1][6:]
         filhos.append((0, filho, 0))
-        filhos.append((0, filha, 0))
         tam_lista = len(populacao)
         tax -= 1
         if tax <= 0:
@@ -96,27 +95,24 @@ def mutar(populacao:tuple):
     return populacao
 
 geracao = 0
-populacao = gerarPopulacaoInicial(TAMANHO_POPULACAO)
+populacao = preencherPopulacao(TAMANHO_POPULACAO)
 elite = selecionarElite(populacao)
 filhos = gerarFilhos(populacao)
 filhos = mutar(filhos)
 populacao.clear()
-populacao = elite + filhos
-populacao = mudarNumeroDaGeracao(populacao)
-print(populacao)
+populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
 populacao = avaliarPopulacao(populacao)
 elite.clear()
 filhos.clear()
 
-while geracao < 5:  
+while geracao < 100:  
     elite = selecionarElite(populacao)
     filhos = gerarFilhos(populacao)
     filhos = mutar(filhos)
     populacao.clear()
-    populacao = elite + filhos
+    populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
     populacao = mudarNumeroDaGeracao(populacao)
     populacao = avaliarPopulacao(populacao)
-    populacao = mudarNumeroDaGeracao(populacao)
     geracao += 1
 
 print("Final population after 5 generations:")
