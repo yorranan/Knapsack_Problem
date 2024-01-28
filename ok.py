@@ -5,7 +5,7 @@ PESO_MAXIMO = 13
 TAMANHO_POPULACAO = 50
 TAX_CROSSOVER = 50%TAMANHO_POPULACAO
 TAX_MUTACAO = 20%TAMANHO_POPULACAO
-TAM_ELITE = 20%TAMANHO_POPULACAO
+TAMANHO_ELITE = 20%TAMANHO_POPULACAO
 
 def mudarNumeroDaGeracao(populacao):
     global geracao
@@ -57,7 +57,7 @@ def selecionarElite(populacao):
     melhores_resultados = []
     populacao.sort(key=lambda x: x[2], reverse=True)
     i = 0
-    while i < TAM_ELITE:
+    while i < TAMANHO_ELITE:
         try:
             melhores_resultados.append(populacao.pop(0))
         except IndexError:
@@ -72,7 +72,7 @@ def gerarFilhos(populacao:list):
     while tam_lista >= 2:
         pai = populacao.pop(random.choice(range(len(populacao))))
         mae = populacao.pop(random.choice(range(len(populacao))))
-        filho = pai[1][:6] + mae[1][6:]
+        filho = pai[1][:3] + mae[1][3:]
         filhos.append((0, filho, 0))
         tam_lista = len(populacao)
         tax -= 1
