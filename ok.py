@@ -1,12 +1,8 @@
 import random
+import csv
 
-TAMANHO_CROMOSSOMO = 7
+TAMANHO_CROMOSSOMO = 16
 PESO_MAXIMO = 13
-TAMANHO_POPULACAO = int(input("Tamanho da Populacao : "))
-TAX_CROSSOVER = int(input("Taxa de Crossover : "))//TAMANHO_POPULACAO
-TAX_MUTACAO = int(input("Taxa de Mutacao : "))//TAMANHO_POPULACAO
-NUM_GERACOES = int(input("Numero de Geracoes : "))
-TAMANHO_ELITE = 20//TAMANHO_POPULACAO
 
 def preencherPopulacao(tamanho):
     global geracao
@@ -35,14 +31,14 @@ def avaliarPopulacao(populacao):
 
 def calcularFitness(cromossomo:list):
     fitness = 0
-    lista_de_valores = [2, 7, 3, 4, 5, 2, 6]
+    lista_de_valores = [2, 7, 3, 4, 5, 2, 6, 10, 4, 8, 7, 12, 1, 5, 16, 2]
     for i, j in zip(cromossomo, lista_de_valores):
         fitness += i * j
     return fitness
 
 def calcularPeso(cromossomo:list):
     peso = 0
-    lista_de_pesos = [6, 3, 1, 7, 4, 2, 5]
+    lista_de_pesos = [6, 3, 1, 7, 4, 2, 5, 3, 5, 1, 6, 10, 1, 2, 20, 3]
     for i, j in zip(cromossomo, lista_de_pesos):
         peso += i * j
     return peso
@@ -67,7 +63,7 @@ def gerarFilhos(populacao:list):
     while tam_lista >= 2:
         pai = populacao.pop(random.choice(range(len(populacao))))
         mae = populacao.pop(random.choice(range(len(populacao))))
-        filho = pai[1][:3] + mae[1][3:]
+        filho = pai[1][:8] + mae[1][8:]
         filhos.append((geracao, filho, 0))
         tam_lista = len(populacao)
         tax -= 1
@@ -96,31 +92,45 @@ def verificarMelhorResultado(populacao):
     if not melhor_resultado_global or resultado[2] > melhor_resultado_global[2]:
         melhor_resultado_global = resultado
 
-geracao = 0
-melhor_resultado_global = None
-populacao = preencherPopulacao(TAMANHO_POPULACAO)
-elite = selecionarElite(populacao)
-filhos = gerarFilhos(populacao)
-filhos = mutar(filhos)
-populacao.clear()
-populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
-populacao = avaliarPopulacao(populacao)
-elite.clear()
-filhos.clear()
+def EscreverNoCSV(population, filename):
+    global rodada
+    with open(filename, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        for individual in population:
+            writer.writerow([rodada, individual[0], individual[1], individual[2]])
 
-while geracao < NUM_GERACOES:  
-    geracao += 1
+with open('melhores_resultados.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['Rodada', 'Geracao', 'Cromossomo', 'Fitness'])
+
+n = int(input("Número de casos:"))
+for rodada in range(n):
+    TAMANHO_POPULACAO = int(input("Tamanho da Populacao : "))
+    TAX_CROSSOVER = int(input("Taxa de Crossover : "))//TAMANHO_POPULACAO
+    TAX_MUTACAO = int(input("Taxa de Mutacao : "))//TAMANHO_POPULACAO
+    NUM_GERACOES = int(input("Numero de Geracoes : "))
+    TAMANHO_ELITE = 20//TAMANHO_POPULACAO
+    geracao = 0
+    melhor_resultado_global = None
+    populacao = preencherPopulacao(TAMANHO_POPULACAO)
     elite = selecionarElite(populacao)
     filhos = gerarFilhos(populacao)
     filhos = mutar(filhos)
     populacao.clear()
     populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
     populacao = avaliarPopulacao(populacao)
-    verificarMelhorResultado(populacao)
+    elite.clear()
+    filhos.clear()
 
-print("Melhor resultado global:")
-print(melhor_resultado_global)
-print("População Final após", NUM_GERACOES ,"gerações:")
-populacao.sort(key=lambda x: x[2], reverse=True)
-for individuo in populacao:
-    print(individuo)
+    while geracao < NUM_GERACOES:  
+        geracao += 1
+        elite = selecionarElite(populacao)
+        filhos = gerarFilhos(populacao)
+        filhos = mutar(filhos)
+        populacao.clear()
+        populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
+        populacao = avaliarPopulacao(populacao)
+        verificarMelhorResultado(populacao)
+
+    EscreverNoCSV([melhor_resultado_global], 'melhores_resultados.csv')
+    EscreverNoCSV(populacao, f'populacoes_final_{rodada}.csv')
