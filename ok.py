@@ -1,5 +1,8 @@
+import matplotlib.pyplot as plt
 import random
 import csv
+import time
+import pandas as pd
 
 TAMANHO_CROMOSSOMO = 16
 PESO_MAXIMO = 13
@@ -76,8 +79,8 @@ def mutar(populacao:tuple):
     while i < TAX_MUTACAO:
         individuo = random.choice(populacao)
         cromossomo = individuo[1]
-        for _ in range(3): 
-            for j in range(len(cromossomo)): 
+        for _ in range(3):
+            for j in range(len(cromossomo)):
                 cromossomo = list(cromossomo)
                 cromossomo[j] = random.randrange(0, 2)
                 cromossomo = tuple(cromossomo)
@@ -92,19 +95,25 @@ def verificarMelhorResultado(populacao):
     if not melhor_resultado_global or resultado[2] > melhor_resultado_global[2]:
         melhor_resultado_global = resultado
 
-def EscreverNoCSV(population, filename):
+melhor_fitness = []
+elapsed_times = []
+
+def EscreverNoCSV(population, filename, elapsed_time):
     global rodada
     with open(filename, 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
         for individual in population:
-            writer.writerow([rodada, individual[0], individual[1], individual[2]])
+            writer.writerow([rodada, individual[0], individual[1], individual[2], elapsed_time])
+            melhor_fitness.append(individual[2])
+
 
 with open('melhores_resultados.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['Rodada', 'Geracao', 'Cromossomo', 'Fitness'])
+        writer.writerow(['Rodada', 'Geracao', 'Cromossomo', 'Fitness', 'Tempo de Execução'])
 
 n = int(input("Número de casos:"))
 for rodada in range(n):
+    start_time = time.time()
     TAMANHO_POPULACAO = int(input("Tamanho da Populacao : "))
     TAX_CROSSOVER = int(input("Taxa de Crossover : "))//TAMANHO_POPULACAO
     TAX_MUTACAO = int(input("Taxa de Mutacao : "))//TAMANHO_POPULACAO
@@ -122,7 +131,7 @@ for rodada in range(n):
     elite.clear()
     filhos.clear()
 
-    while geracao < NUM_GERACOES:  
+    while geracao < NUM_GERACOES:
         geracao += 1
         elite = selecionarElite(populacao)
         filhos = gerarFilhos(populacao)
@@ -132,5 +141,18 @@ for rodada in range(n):
         populacao = avaliarPopulacao(populacao)
         verificarMelhorResultado(populacao)
 
-    EscreverNoCSV([melhor_resultado_global], 'melhores_resultados.csv')
-    EscreverNoCSV(populacao, f'populacoes_final_{rodada}.csv')
+    elapsed_time = time.time() - start_time
+    EscreverNoCSV([melhor_resultado_global], 'melhores_resultados.csv', elapsed_time)
+    EscreverNoCSV(populacao, f'populacoes_final_{rodada}.csv', elapsed_time)
+    elapsed_times.append(elapsed_time)0
+
+plt.plot(melhor_fitness)
+plt.title('Melhores Valores de Fitness por Rodada')
+plt.xlabel('Número da Rodada')
+plt.ylabel('Melhor Fitness')
+plt.show()
+plt.plot(elapsed_times)
+plt.title('Tempo de execução por rodada')
+plt.xlabel('Rodada')
+plt.ylabel('Tempo de execução (segundos0)')
+plt.show()
