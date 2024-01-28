@@ -144,7 +144,7 @@ for rodada in range(n):
     elapsed_time = time.time() - start_time
     EscreverNoCSV([melhor_resultado_global], 'melhores_resultados.csv', elapsed_time)
     EscreverNoCSV(populacao, f'populacoes_final_{rodada}.csv', elapsed_time)
-    elapsed_times.append(elapsed_time)0
+    elapsed_times.append(elapsed_time)
 
 plt.plot(melhor_fitness)
 plt.title('Melhores Valores de Fitness por Rodada')
