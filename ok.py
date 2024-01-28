@@ -2,17 +2,11 @@ import random
 
 TAMANHO_CROMOSSOMO = 7
 PESO_MAXIMO = 13
-TAMANHO_POPULACAO = 50
-TAX_CROSSOVER = 50%TAMANHO_POPULACAO
-TAX_MUTACAO = 20%TAMANHO_POPULACAO
+TAMANHO_POPULACAO = int(input("Tamanho da Populacao : "))
+TAX_CROSSOVER = int(input("Taxa de Crossover : "))%TAMANHO_POPULACAO
+TAX_MUTACAO = int(input("Taxa de Mutacao : "))%TAMANHO_POPULACAO
+NUM_GERACOES = int(input("Numero de Geracoes : "))
 TAMANHO_ELITE = 20%TAMANHO_POPULACAO
-
-def mudarNumeroDaGeracao(populacao):
-    global geracao
-    nova = []
-    for individuo in populacao:
-        nova.append((individuo[0]+1, individuo[1], individuo[2]))
-    return nova
 
 def preencherPopulacao(tamanho):
     global geracao
@@ -105,16 +99,16 @@ populacao = avaliarPopulacao(populacao)
 elite.clear()
 filhos.clear()
 
-while geracao < 100:  
+while geracao < NUM_GERACOES:  
     elite = selecionarElite(populacao)
     filhos = gerarFilhos(populacao)
     filhos = mutar(filhos)
     populacao.clear()
     populacao = elite + filhos + preencherPopulacao(TAMANHO_POPULACAO-len(elite)-len(filhos))
-    populacao = mudarNumeroDaGeracao(populacao)
     populacao = avaliarPopulacao(populacao)
     geracao += 1
 
-print("Final population after 5 generations:")
+print("Final population after", NUM_GERACOES ,"generations:")
+populacao.sort(key=lambda x: x[2], reverse=True)
 for individuo in populacao:
     print(individuo)
